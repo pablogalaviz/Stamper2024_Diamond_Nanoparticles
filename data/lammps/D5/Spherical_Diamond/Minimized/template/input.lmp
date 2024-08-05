@@ -2,7 +2,7 @@
 #
 
 # ----------------------------- Initialization Section --------------------
-
+    newton on
     units        metal
     atom_style   full
     pair_style  airebo 3 0 0 
@@ -49,9 +49,10 @@ thermo_style    custom step temp pe etotal press vol epair #ebond eangle edihed
 thermo          1  # time interval for printing out "thermo" data
 write_data ./results/system_before_nvt.data
 
-minimize 1.0e-4 1.0e-6 100 1000
+min_style cg
+minimize 0.0 1.0e-8 10000 100000
 
-dump myDump all atom 3 ./results/nvt_prod.lammpstrj
+dump myDump all atom/gz 3 ./results/nvt_prod.lammpstrj.gz
 
 velocity all create ${SetTemp} 48455 mom yes rot yes
 fix mynvt all nvt temp ${SetTemp} ${SetTemp} 0.1
