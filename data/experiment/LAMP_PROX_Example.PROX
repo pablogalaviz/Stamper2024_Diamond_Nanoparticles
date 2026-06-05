@@ -1,0 +1,34 @@
+;T = 300 K 
+
+;Lambda = 4.69A 
+
+;Background and Vanadium data 
+
+w60=rdsum(72214,72215) ; Vanadium data, 300 K 
+w60=remove_spectra(w60,[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]) ; remove data from blocked detectors 
+
+w50=rdsum(93358,93362) ; empty can data, 300K  
+w50=remove_spectra(w50,[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]) ; remove data from blocked detectors 
+
+;Sample data 
+w1=rdsum(93318,93322) ; read data, 300K,  
+w1=remove_spectra(w1,[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]) ; remove data from blocked detectors 
+
+w2 = w1-w51  ;empty can subtraction
+e2= sqrt(e1^2+e51^2)  ;error propagation
+ 
+w3 = vnorm(w2,w60,min=768,max=800)  ; time channels, 768 and 800 
+w4=t2e(w3)    ;time to energy                        
+w5=reb(w4,dE = 0.01)          ;re-bin energy  
+w10=sqw_rebin(w5,dQ=0.005, Emin=-200) 
+w11=transpose(w10) ;calculate S(Q,E) matrix 
+w12=total(w5,1)   ;diffraction pattern in 2theta 
+                    
+;GDOS 
+w24 = reb(w4,dE = 0.2)  ; re-bin energy, set step size 
+w26 = gdos(w24,T=300,Emin=-250.0,Emax=-0.2,inv=1) ;calculate g(Q,E)
+w27 = total(w26,2) ;calculate g(E) 
+
+; write files out 
+output, w27, file='PDOS _300K.txt' 
+output, w11, file= SQE_300K.txt' 
